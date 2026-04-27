@@ -13,25 +13,37 @@ const CATEGORY_ORDER: MenuCategory[] = [
   "spicy_pizza",
   "børne_pizza",
   "deep_pan",
-  "pasta",
   "indbagt",
   "ufo",
   "pizza_sandwich",
+  "pita",
+  "rulle",
+  "pasta",
+  "grill",
+  "nachos",
+  "burger",
+  "snacks",
   "tilbehør",
   "drikkevare",
 ];
 
 const CATEGORY_COLORS: Record<MenuCategory, string> = {
-  pizza: "from-orange-500 to-red-500",
-  spicy_pizza: "from-red-600 to-rose-700",
-  børne_pizza: "from-yellow-400 to-orange-400",
-  deep_pan: "from-amber-600 to-orange-600",
-  pasta: "from-yellow-500 to-amber-500",
-  indbagt: "from-green-600 to-emerald-600",
-  ufo: "from-purple-600 to-indigo-600",
+  pizza:          "from-orange-500 to-red-500",
+  spicy_pizza:    "from-red-600 to-rose-700",
+  børne_pizza:    "from-yellow-400 to-orange-400",
+  deep_pan:       "from-amber-600 to-orange-600",
+  pasta:          "from-yellow-500 to-amber-500",
+  indbagt:        "from-green-600 to-emerald-600",
+  ufo:            "from-purple-600 to-indigo-600",
   pizza_sandwich: "from-teal-500 to-cyan-500",
-  tilbehør: "from-lime-500 to-green-500",
-  drikkevare: "from-blue-500 to-cyan-500",
+  pita:           "from-lime-600 to-green-600",
+  rulle:          "from-emerald-500 to-teal-500",
+  grill:          "from-orange-700 to-red-700",
+  nachos:         "from-yellow-600 to-amber-600",
+  burger:         "from-red-500 to-orange-500",
+  snacks:         "from-pink-500 to-rose-500",
+  tilbehør:       "from-lime-500 to-green-500",
+  drikkevare:     "from-blue-500 to-cyan-500",
 };
 
 export default function MenuDisplay({ items }: Props) {
@@ -136,13 +148,29 @@ export default function MenuDisplay({ items }: Props) {
                           </p>
                         </div>
                         <div className="flex-shrink-0 text-right">
-                          <span className="text-orange-400 font-black text-base">
-                            {item.price} kr
-                          </span>
-                          {item.price_large && (
-                            <div className="text-gray-500 text-xs">
-                              / {item.price_large} kr
+                          {item.price_large ? (
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-1.5 justify-end">
+                                <span className="text-xs text-gray-500 font-medium">
+                                  {cat === "burger" ? "Alm." : "Alm."}
+                                </span>
+                                <span className="text-orange-400 font-black text-sm">
+                                  {item.price} kr
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1.5 justify-end">
+                                <span className="text-xs text-gray-500 font-medium">
+                                  {cat === "burger" ? "Menu" : "3 Pers."}
+                                </span>
+                                <span className="text-orange-300 font-black text-sm">
+                                  {item.price_large} kr
+                                </span>
+                              </div>
                             </div>
+                          ) : (
+                            <span className="text-orange-400 font-black text-base">
+                              {item.price} kr
+                            </span>
                           )}
                         </div>
                       </div>

@@ -7,6 +7,12 @@ export type MenuCategory =
   | "indbagt"
   | "ufo"
   | "pizza_sandwich"
+  | "pita"
+  | "rulle"
+  | "grill"
+  | "nachos"
+  | "burger"
+  | "snacks"
   | "tilbehør"
   | "drikkevare";
 
@@ -44,14 +50,20 @@ export interface ChatMessage {
 }
 
 export const CATEGORY_LABELS: Record<MenuCategory, string> = {
-  pizza: "🍕 Pizza",
-  spicy_pizza: "🌶️ Spicy Pizza",
-  børne_pizza: "👶 Børne Pizza",
-  deep_pan: "🥘 Deep Pan",
-  pasta: "🍝 Pasta",
-  indbagt: "📦 Indbagt / Calzone",
-  ufo: "🛸 UFO",
+  pizza:          "🍕 Pizza",
+  spicy_pizza:    "🌶️ Spicy Pizza",
+  børne_pizza:    "👶 Børne Pizza",
+  deep_pan:       "🥘 Deep Pan",
+  pasta:          "🍝 Pasta",
+  indbagt:        "📦 Indbagt / Calzone",
+  ufo:            "🛸 UFO",
   pizza_sandwich: "🥪 Pizza Sandwich",
-  tilbehør: "🥗 Tilbehør",
-  drikkevare: "🥤 Drikkevarer",
+  pita:           "🫓 Pita",
+  rulle:          "🌯 Rulle",
+  grill:          "🔥 Grill",
+  nachos:         "🧀 Nachos",
+  burger:         "🍔 Burger",
+  snacks:         "🍟 Snacks",
+  tilbehør:       "🫒 Tilbehør",
+  drikkevare:     "🥤 Drikkevarer",
 };
