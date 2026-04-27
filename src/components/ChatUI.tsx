@@ -1,18 +1,44 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import type { ChatMessage } from "@/lib/types";
+import type { ChatMessage, OrderItem } from "@/lib/types";
+
+function detectOrder(text: string): OrderItem[] {
+  const keywords = [
+    "betal", "bestil", "ordre", "total", "kr.", "stk",
+    "margherita", "pepperoni", "hawaii", "kylling", "kebab",
+  ];
+  const lower = text.toLowerCase();
+  if (!keywords.some((k) => lower.includes(k))) return [];
+
+  const lines = text.split("\n");
+  const items: OrderItem[] = [];
+  const priceRegex = /(.+?)\s*[-–]\s*(\d+)\s*kr/gi;
+  let match;
+  while ((match = priceRegex.exec(text)) !== null) {
+    items.push({
+      menu_item_id: "",
+      name: match[1].trim(),
+      quantity: 1,
+      price: parseInt(match[2]),
+    });
+  }
+  return items;
+}
 
 export default function ChatUI() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
       content:
-        "Hej og velkommen til Bella Pizza! 🍕 Jeg hjælper dig gerne med at bestille eller svare på spørgsmål om vores menu. Hvad kan jeg gøre for dig?",
+        "Hej og velkommen til Spicy Pizza & Grill! 🍕 Jeg hjælper dig gerne med at bestille eller svare på spørgsmål om vores menu. Hvad kan jeg gøre for dig?",
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [pendingOrder, setPendingOrder] = useState<OrderItem[]>([]);
+  const [customerName, setCustomerName] = useState("");
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -56,6 +82,9 @@ export default function ChatUI() {
           { role: "assistant", content: fullText },
         ]);
       }
+
+      const detectedItems = detectOrder(fullText);
+      if (detectedItems.length > 0) setPendingOrder(detectedItems);
     } catch {
       setMessages([
         ...updatedMessages,
@@ -70,6 +99,28 @@ export default function ChatUI() {
     }
   }
 
+  async function handleCheckout() {
+    if (!pendingOrder.length) return;
+    setIsCheckingOut(true);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: pendingOrder, customerName }),
+      });
+      const { url } = await res.json();
+      if (url) window.location.href = url;
+    } catch {
+      alert("Betalingsfejl — prøv igen.");
+    } finally {
+      setIsCheckingOut(false);
+    }
+  }
+
+  const orderTotal = pendingOrder.reduce(
+    (sum, i) => sum + i.price * i.quantity, 0
+  );
+
   return (
     <div className="flex flex-col h-full bg-white rounded-2xl shadow-xl overflow-hidden border border-orange-100">
       {/* Header */}
@@ -77,7 +128,7 @@ export default function ChatUI() {
         <div className="flex items-center gap-3">
           <span className="text-3xl">🍕</span>
           <div>
-            <h2 className="text-lg font-bold">Bella Pizza</h2>
+            <h2 className="text-lg font-bold">Spicy Pizza & Grill</h2>
             <p className="text-orange-100 text-sm">Din digitale pizzabud</p>
           </div>
           <div className="ml-auto flex items-center gap-1.5">
@@ -116,6 +167,37 @@ export default function ChatUI() {
         ))}
         <div ref={bottomRef} />
       </div>
+
+      {/* Betalingspanel */}
+      {pendingOrder.length > 0 && (
+        <div className="mx-4 mb-3 bg-orange-50 border border-orange-200 rounded-xl p-4">
+          <p className="text-xs font-semibold text-orange-700 mb-2">Din ordre</p>
+          {pendingOrder.map((item, i) => (
+            <div key={i} className="flex justify-between text-xs text-gray-700">
+              <span>{item.name}</span>
+              <span>{item.price} kr</span>
+            </div>
+          ))}
+          <div className="border-t border-orange-200 mt-2 pt-2 flex justify-between font-bold text-sm text-orange-700">
+            <span>Total</span>
+            <span>{orderTotal} kr</span>
+          </div>
+          <input
+            type="text"
+            placeholder="Dit navn"
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
+            className="mt-3 w-full rounded-lg border border-orange-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+          />
+          <button
+            onClick={handleCheckout}
+            disabled={!customerName.trim() || isCheckingOut}
+            className="mt-2 w-full bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white font-bold py-2.5 rounded-xl text-sm transition-colors"
+          >
+            {isCheckingOut ? "Sender til betaling..." : `Betal ${orderTotal} kr med kort 💳`}
+          </button>
+        </div>
+      )}
 
       {/* Quick suggestions */}
       {messages.length === 1 && (
