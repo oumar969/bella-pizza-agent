@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getMenuItems } from "@/lib/supabase";
 import MenuDisplay from "@/components/MenuDisplay";
 import type { MenuItem } from "@/lib/types";
