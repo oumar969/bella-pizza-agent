@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(wsl -e bash -c \"cd ~/bella-pizza-agent && node --version && npm --version\")",
+      "PowerShell(wsl -e bash -c \"cd ~/bella-pizza-agent && npm install @supabase/supabase-js @anthropic-ai/sdk 2>&1\")"
+    ]
+  }
+}
